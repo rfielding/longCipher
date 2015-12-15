@@ -18,7 +18,10 @@ func doCipherByName(inName, outName string, key []byte, iv [aes.BlockSize]byte) 
 		return err
 	}
 	defer outFile.Close()
+	return doCipherByReaderWriter(inFile, outFile, key, iv)
+}
 
+func doCipherByReaderWriter(inFile io.Reader, outFile io.Writer, key []byte, iv [aes.BlockSize]byte) error {
 	writeCipher, err := aes.NewCipher(key)
 	if err != nil {
 		return err
@@ -30,7 +33,7 @@ func doCipherByName(inName, outName string, key []byte, iv [aes.BlockSize]byte) 
 
 	reader := &cipher.StreamReader{S: writeCipherStream, R: inFile}
 	if _, err := io.Copy(outFile, reader); err != nil {
-		panic(err)
+		return err
 	}
 
 	return nil
